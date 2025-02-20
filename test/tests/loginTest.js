@@ -6,8 +6,7 @@ describe('Login and Sorting Tests', function() {
     let driver;
     let loginPage;
 
-    // Increase timeout for the 'before' hook
-    this.timeout(10000); // Increase the timeout to 10 seconds for the 'before' hook
+    this.timeout(10000); 
 
     // Before hook to set up the browser and login page
     before(async function () {
@@ -29,34 +28,27 @@ describe('Login and Sorting Tests', function() {
 
     // Test case: should sort the Amount column
     it("should sort the Amount column", async function () {
-        this.timeout(5000); // Increase the timeout to 5 seconds for this test case
-
-        await driver.findElement(By.id('amount')).click(); // Click the "Amount" header to sort
-        await driver.sleep(1000); // Wait for the table to reload
-
-        let amountsBeforeSort = await driver.findElements(By.css('td.text-right bolder nowrap span.text-danger'));
-        let amountTextBeforeSort = [];
-        for (let amount of amountsBeforeSort) {
-            let text = await amount.getText();
-            amountTextBeforeSort.push(parseFloat(text.replace(/[^\d.-]/g, '')));
-        }
-
-        // Click again to sort in descending order
+        this.timeout(5000); // Increase timeout to 5 seconds
+    
+        // Click the "Amount" header to sort
         await driver.findElement(By.id('amount')).click();
-        await driver.sleep(1000); // Wait for the table to reload again
-
-        let amountsAfterSort = await driver.findElements(By.css('td.text-right bolder nowrap span.text-danger'));
-        let amountTextAfterSort = [];
-        for (let amount of amountsAfterSort) {
+        await driver.sleep(2000); // Wait for sorting to complete
+    
+        // Get the amounts after sorting
+        let amounts = await driver.findElements(By.css('td.text-right bolder nowrap span.text-danger'));
+        let amountValues = [];
+        
+        for (let amount of amounts) {
             let text = await amount.getText();
-            amountTextAfterSort.push(parseFloat(text.replace(/[^\d.-]/g, '')));
+            amountValues.push(parseFloat(text.replace(/[^\d.-]/g, ''))); // Extract numerical values
         }
-
-        let isSortedAscending = amountTextBeforeSort.every((val, i, arr) => !i || val >= arr[i - 1]);
-        let isSortedDescending = amountTextBeforeSort.every((val, i, arr) => !i || val <= arr[i - 1]);
-
-        expect(isSortedAscending || isSortedDescending).to.be.true;
+    
+        // Check if the values are sorted in ascending order
+        let isSortedAscending = amountValues.every((val, i, arr) => i === 0 || val >= arr[i - 1]);
+    
+        expect(isSortedAscending).to.be.true; // Test should pass if sorted correctly
     });
+    
 
     // After hook to close the browser
     after(async function () {
@@ -65,3 +57,5 @@ describe('Login and Sorting Tests', function() {
         }
     });
 });
+
+//npx mocha test/tests/loginTest.js
